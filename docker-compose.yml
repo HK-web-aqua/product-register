@@ -1,0 +1,32 @@
+version: '3'
+
+# db-dataというvolumeを作成
+# docker volumeコマンドで確認
+volumes:
+   db-data:
+
+services: 
+  my-app-web:
+    build: .
+    ports: 
+      - '3000:3000'
+    volumes: 
+      - '.:/product-register'
+    environment: 
+      - 'DATABASE_PASSWORD=postgres'
+    tty: true
+    stdin_open: true
+    # dbのコンテナができたらこのコンテナを作成する
+    depends_on: 
+      - db
+    # このコンテナからdbにアクセスすることができる
+    links: 
+      - db
+  
+  db:
+    image: postgres
+    volumes: 
+      - 'db-data:/var/lib/postgresql/data'
+    restart: always
+    environment: 
+      POSTGRES_PASSWORD: postgres
